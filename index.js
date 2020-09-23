@@ -13,6 +13,7 @@ const port = 5000       // Port to run on
 
 app.use(bodyParser.json())  // Parse JSON request bodies
 
+// Create MySQL connection
 var con = mysql.createConnection({
     host: "localhost",
     user: "note_user",
@@ -20,6 +21,8 @@ var con = mysql.createConnection({
     database: "note_app"
 });
 
+
+// Connect to database
 con.connect(function(err) {
     if (err) throw err;
     console.log("Connected!");
@@ -34,15 +37,17 @@ app.get('/', (req, res) => {
     res.sendFile('templates/index.html', {root: __dirname });
 })
 
-// "/allNotes" route gets all notes from db and sends them
+// "/allNotes" route
 app.get('/allNotes', (req, res) => {
     res.sendFile('templates/allNotes.html', {root: __dirname });
 })
 
+// "/editNotes" route
 app.get('/editNote', (req, res) => {
     res.sendFile('templates/editNote.html', {root: __dirname });
 })
 
+// "/newNote" route
 app.get('/newNote', (req, res) => {
     res.sendFile('templates/newNote.html', {root: __dirname });
 });
@@ -52,6 +57,7 @@ app.get('/newNote', (req, res) => {
 // All Web API routes Below
 //
 
+// Get all notes from database
 app.get('/api/getAllNotes', (req, res) => {
     con.query("SELECT * FROM note", function (err, result, fields) {
         if (err) throw err;
@@ -60,6 +66,7 @@ app.get('/api/getAllNotes', (req, res) => {
     });
 });
 
+// Create new note with title and body
 app.post('/api/createNote', (req, res) => {
     var sql = "INSERT INTO note (title, body, created_date, modified_date) VALUES (?, ?, curdate(), curdate())";
     con.query(sql, [req.body.title, req.body.body], function (err, result) {
@@ -69,6 +76,7 @@ app.post('/api/createNote', (req, res) => {
     res.json({})
 });
 
+// Get note with note_id
 app.get('/api/getNote', (req, res) => {
     con.query("SELECT * FROM note WHERE note_id = ?", [req.query.id], function (err, result) {
         if (err) throw err;
@@ -76,6 +84,7 @@ app.get('/api/getNote', (req, res) => {
     });
 });
 
+// Update a note's title and body with note_id
 app.post('/api/updateNote', (req, res) => {
     con.query("UPDATE note SET title = ?, body = ?, modified_date=curdate() WHERE note_id = ?",
         [req.body.title, req.body.body, req.query.id], function (err, result) {
@@ -84,6 +93,7 @@ app.post('/api/updateNote', (req, res) => {
     });
 });
 
+// Delete a note with note_id
 app.post('/api/deleteNote', (req, res) => {
     con.query("DELETE FROM note WHERE note_id = ?", [req.query.id], function (err, result) {
         if (err) throw err;
