@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes: All Notes</title>
+</head>
+
+<body>
+    <a href="/"><button>Home</button></a>
+    <br/>
+    <br/>
+
+    <input type="text" id="title"/>
+
+    <br/>
+    <textarea id="body"></textarea>
+
+    <div id="createdDate"></div>
+    <div id="modifiedDate"></div>
+
+    <button onClick="submit()"> SUBMIT CHANGES </button>
+    <br/>
+    <br/>
+
+    <button onClick="deleteNote()"> DELETE NOTE </button>
+</body>
+
+<script async>
+        async function getNote() {
+            var urlParams = new URLSearchParams(window.location.search);
+            let url = window.location.protocol + "//" + window.location.host + "/api/getNote?id=" + urlParams.get('id');
+
+            let result = await fetch(url, {
+                method: 'get'
+            }).then(function(response) {
+                if (response.status == 200) {
+                    return response.json();
+                }
+                else {
+                    return [{}];
+                }
+            });
+
+            let note = result[0];
+
+            let title = document.getElementById("title");
+            let body = document.getElementById("body");
+            let createdDate = document.getElementById("createdDate");
+            let modifiedDate = document.getElementById("modifiedDate");
+
+            title.value = note.title;
+            body.value = note.body;
+            createdDate.innerHTML = "Created: " + note.created_date;
+            modifiedDate.innerHTML = "Modified: " + note.modified_date;
+
+            console.log(result);
+        }
+
+        async function submit() {
+            var urlParams = new URLSearchParams(window.location.search);
+            let url = window.location.protocol + "//" + window.location.host + "/api/updateNote?id=" + urlParams.get('id');
+
+            let title = document.getElementById("title");
+            let body = document.getElementById("body");
+
+            let result = await fetch(url, {
+                method: 'post',
+                body: JSON.stringify({
+                        "title": title.value,
+                        "body": body.value
+                    }),
+                headers: {"Content-type" : "application/json"}
+            }).then(function(response) {
+                if (response.status == 200) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            if (result) {
+                    location.replace(window.location.protocol + "//" + window.location.host + "/");
+            }
+            else {
+                window.alert("Note Creation Failed.");
+            }
+        }
+
+        async function deleteNote() {
+            var urlParams = new URLSearchParams(window.location.search);
+            let url = window.location.protocol + "//" + window.location.host + "/api/deleteNote?id=" + urlParams.get('id');
+
+            let result = await fetch(url, {
+                method: 'post'
+            }).then(function(response) {
+                if (response.status == 200) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            if (result) {
+                    location.replace(window.location.protocol + "//" + window.location.host + "/");
+            }
+            else {
+                window.alert("Note Deletion Failed.");
+            }
+        }
+
+        getNote();
+    </script>
+</html>

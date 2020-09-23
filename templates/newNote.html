@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Notes: New Note</title>
+    </head>
+
+    <script>
+        async function submit() {
+            let title = document.getElementById("titleInputBox").value;
+            let body = document.getElementById("bodyTextBox").value;
+
+            if (title !== "" && body !== "") {
+                let url = window.location.protocol + "//" + window.location.host + "/api/createNote";
+
+                let result = await fetch(url, {
+                    method: 'post',
+                    body: JSON.stringify({"title":title,"body":body}),
+                    headers: {"Content-type" : "application/json"}
+                }).then(function(response) {
+                    return response.status == 200;
+                });
+
+                if (result) {
+                    location.replace(window.location.protocol + "//" + window.location.host + "/");
+                }
+                else {
+                    window.alert("Note Creation Failed.");
+                }
+            }
+        }
+    </script>
+
+    <body>
+        <a href="/"><button>Home</button></a>
+        <br/>
+        <br/>
+
+        Title:
+        <br />
+        <input type="text" id="titleInputBox" name="title" value="" />
+
+        <br />
+        <br />
+
+        Body:
+        <br />
+        <textarea id="bodyTextBox" name="body"></textarea>
+
+        <br />
+        <br />
+        <button onClick="submit()">SUBMIT</button>
+    </body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Notes: All Notes</title>
+    </head>
+
+    <body>
+        <a href="/"><button>Home</button></a>
+        <br/>
+        <br/>
+
+        <ul id="noteList">
+
+        </ul>
+    </body>
+
+    <script async>
+        async function getNotes() {
+            let url = window.location.protocol + "//" + window.location.host + "/api/getAllNotes";
+
+            let result = await fetch(url, {
+                method: 'get'
+            }).then(function(response) {
+                if (response.status == 200) {
+                    return response.json();
+                }
+                else {
+                    return [];
+                }
+            });
+
+            let noteList = document.getElementById("noteList");
+
+            for (var i in result) {
+                let item = result[i];
+                let listItem = document.createElement('li');
+                listItem.innerHTML = "<a href=\"/editNote?id=" + item.note_id + "\">" + item.title + "</a>";
+                console.log(item.innerHTML);
+                noteList.appendChild(listItem);
+            }
+        }
+
+        getNotes();
+    </script>
+</html>
